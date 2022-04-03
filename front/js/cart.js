@@ -10,19 +10,19 @@ function getProductsFromCart() {
     const storage = getStorageByName('ProductStorage');
 
     for (let prd of storage) {
-        getProduct(prd.id, prd);
+        getProduct(prd);
     }
     showTotalCart();
 
 }
 
 /** Get one product detail from API */
-function getProduct(id, cartInfo) {
-    fetch(apiURL + id)
+function getProduct(prdStorage) {
+    fetch(apiURL + prdStorage.id)
         .then(function(response) {
             if (response.ok) {
-                response.json().then(function(product) {
-                    showProduct(product, cartInfo);
+                response.json().then(function(prdApi) {
+                    showProduct(prdApi, prdStorage);
                 }).then(addEventListener);
             }
         })
@@ -31,25 +31,25 @@ function getProduct(id, cartInfo) {
         });
 }
 /** show products detail to pageweb */
-function showProduct(product, cartInfo) {
+function showProduct(prdApi, prdStorage) {
     const element = document.createElement('article');
     element.className = "cart__item";
-    element.setAttribute('data-id', cartInfo.id);
-    element.setAttribute('data-color', cartInfo.color);
+    element.setAttribute('data-id', prdStorage.id);
+    element.setAttribute('data-color', prdStorage.color);
     element.innerHTML = `
     <div class="cart__item__img">
-        <img src="${product.imageUrl}" alt="${product.altTxt}">
+        <img src="${prdApi.imageUrl}" alt="${prdApi.altTxt}">
     </div>
     <div class="cart__item__content">
         <div class="cart__item__content__description">
-            <h2>${product.name}</h2>
-            <p>${cartInfo.color}</p>
-            <p>${product.price} €</p>
+            <h2>${prdApi.name}</h2>
+            <p>${prdStorage.color}</p>
+            <p>${prdApi.price} €</p>
         </div>
         <div class="cart__item__content__settings">
             <div class="cart__item__content__settings__quantity">
                 <p>Qté : </p>
-                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${cartInfo.quantity}">
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${prdStorage.quantity}">
             </div>
             <div class="cart__item__content__settings__delete">
                 <p class="deleteItem">Supprimer</p>
@@ -99,14 +99,17 @@ function addEventListener() {
     for (var i = 0; i < itemQuantity.length; i++) {
         itemQuantity[i].addEventListener('change', updateQuantity, false);
     }
+
+    document.getElementById("order").addEventListener("click", orderCommand);
+
 }
 /** Remove product */
 var removeProduct = function() {
     const storage = getStorageByName('ProductStorage');
 
     var article = this.closest("article");
-    var id = article.getAttribute("data-id");
-    var color = article.getAttribute("data-color");
+    var id = article.dataset.id;
+    var color = article.dataset.color;
 
     // Remove product from storage
     for (var i = 0; i < storage.length; i++) {
@@ -123,24 +126,30 @@ var removeProduct = function() {
 };
 /** Update product quntity */
 var updateQuantity = function() {
-        console.log(this);
-        const storage = getStorageByName('ProductStorage');
+    console.log(this);
+    const storage = getStorageByName('ProductStorage');
 
-        var article = this.closest("article");
-        var id = article.getAttribute("data-id");
-        var color = article.getAttribute("data-color");
+    var article = this.closest("article");
+    console.log(article.dataset.color);
+    var id = article.dataset.id;
+    var color = article.dataset.color;
 
-        // update product from storage
-        for (var i = 0; i < storage.length; i++) {
+    // update product from storage
+    for (var i = 0; i < storage.length; i++) {
 
-            if (storage[i].id == id && storage[i].color == color) {
-                storage[i].quantity = this.value;
-            }
+        if (storage[i].id == id && storage[i].color == color) {
+            storage[i].quantity = this.value;
         }
-        localStorage.setItem('ProductStorage', JSON.stringify(storage));
-        showTotalCart();
     }
-    /** Get storage by Name */
+    localStorage.setItem('ProductStorage', JSON.stringify(storage));
+    showTotalCart();
+}
+
+function orderCommand() {
+
+    alert('order now');
+}
+/** Get storage by Name */
 function getStorageByName(name) {
     return JSON.parse(localStorage.getItem(name));
 }

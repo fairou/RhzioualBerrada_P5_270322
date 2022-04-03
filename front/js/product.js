@@ -115,20 +115,20 @@ function addProcuct(id, color, quantity) {
 
     const storage = getStorageByName('ProductStorage');
 
-    let objJson = {
+    let newproduct = {
         id: id,
         color: color,
         quantity: Number(quantity)
     };
-    storage.push(objJson);
+    storage.push(newproduct);
 
     localStorage.setItem('ProductStorage', JSON.stringify(storage));
 }
 
 /** Create storage if not exist */
 function createStorage() {
-    let objJson = [];
-    localStorage.setItem('ProductStorage', JSON.stringify(objJson));
+    let newproduct = [];
+    localStorage.setItem('ProductStorage', JSON.stringify(newproduct));
 }
 
 function getStorageByName(name) {
