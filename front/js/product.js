@@ -1,7 +1,5 @@
 /** Constant with URL of the API to fetch for products */
 const apiURL = "http://localhost:3000/api/products/";
-
-
 getProduct();
 
 
@@ -28,8 +26,6 @@ function getProduct() {
 /** show products detail to pageweb */
 function showProduct(product) {
 
-
-
     document.getElementsByClassName("item__img")[0].innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}">`;
 
     document.getElementById("title").innerHTML = product.name;
@@ -53,10 +49,11 @@ document
     .addEventListener("click", addToCart);
 
 function addToCart() {
+    const storage = getStorageByName('ProductStorage');
 
     const id = getUrlParam();
-    const color = document.getElementById("colors").value
-    const quantity = document.getElementById("quantity").value
+    const color = document.getElementById("colors").value;
+    const quantity = document.getElementById("quantity").value;
 
     // 1 vérififier si :
     // 1-1 : un prdt existe ID deja avec la meme couleur
@@ -64,11 +61,18 @@ function addToCart() {
     // sinon:
     // 1-2 : on ajoute un autre produit
 
-    if (existProduct(id, color)) {
-        updateQuantity(id, color, quantity);
+    if (storage) {
+        const existprd = existProduct(id, color);
+        if (existprd) {
+            updateQuantity(id, color, quantity);
+        } else {
+            addProcuct(id, color, quantity);
+        }
     } else {
+        createStorage();
         addProcuct(id, color, quantity);
     }
+
 
 
 }
@@ -77,11 +81,29 @@ function existProduct(id, color) {
     // i need to search on storage and check if existing product with the same id and color exist
     // then : return true;
     // else: return false
+    const storage = JSON.parse(localStorage.getItem('ProductStorage'));
+
+    for (let prd of storage) {
+        if (prd.id == id && prd.color == color) {
+            return true;
+        }
+    }
+    return false;
+
 }
 
-/** update quantity value fro existing product */
+/** update quantity value for existing product */
 function updateQuantity(id, color, quantity) {
     // i need to update storage quantity for a product by id and color
+    const storage = getStorageByName('ProductStorage');;
+
+
+    for (let prd of storage) {
+        if (prd.id == id && prd.color == color) {
+            prd.quantity += Number(quantity);
+        }
+    }
+    localStorage.setItem('ProductStorage', JSON.stringify(storage));
 }
 
 /** add new product */
@@ -90,9 +112,25 @@ function addProcuct(id, color, quantity) {
     // --> createStorage()
     // else 
     // add new product to storage
+
+    const storage = getStorageByName('ProductStorage');
+
+    let objJson = {
+        id: id,
+        color: color,
+        quantity: Number(quantity)
+    };
+    storage.push(objJson);
+
+    localStorage.setItem('ProductStorage', JSON.stringify(storage));
 }
 
 /** Create storage if not exist */
 function createStorage() {
+    let objJson = [];
+    localStorage.setItem('ProductStorage', JSON.stringify(objJson));
+}
 
+function getStorageByName(name) {
+    return JSON.parse(localStorage.getItem(name));
 }
