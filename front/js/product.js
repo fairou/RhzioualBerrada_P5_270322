@@ -1,8 +1,7 @@
 /** Constant with URL of the API to fetch for products */
-const apiURL = "http://localhost:3000/api/products/";
 getProduct();
-
-
+/** call event Click */
+addEvent();
 /** return param id from URL */
 function getUrlParam() {
     var str = window.location.href; // get current url: http://localhost:5501/front/html/product.html?id=107fb5b75607497b96722bda5b504926
@@ -12,6 +11,8 @@ function getUrlParam() {
 
 /** Get one product detail from API */
 function getProduct() {
+    const apiURL = "http://localhost:3000/api/products/";
+
 
     fetch(apiURL + getUrlParam())
         .then(function(response) {
@@ -44,17 +45,27 @@ function showProduct(product) {
     }
 }
 
-document
-    .getElementById("addToCart")
-    .addEventListener("click", addToCart);
+function addEvent() {
+    document
+        .getElementById("addToCart")
+        .addEventListener("click", formValidation);
+}
 
-function addToCart() {
-    const storage = getStorageByName('ProductStorage');
-
+function formValidation() {
     const id = getUrlParam();
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
 
+    if (color != "" && Number(quantity) > 0) {
+        addToCart(id, color, quantity);
+
+    } else {
+        alert("veuillez choisir une couleur et une quantitée");
+    }
+}
+
+function addToCart(id, color, quantity) {
+    const storage = getStorageByName('ProductStorage');
     // 1 vérififier si :
     // 1-1 : un prdt existe ID deja avec la meme couleur
     // --> augmenter quantite du produit

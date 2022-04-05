@@ -1,9 +1,9 @@
 /** Constant with URL of the API to fetch for products */
-const apiURL = "http://localhost:3000/api/products/";
+
 
 /** Get list of all product from API */
 function getAllProducts() {
-
+    const apiURL = "http://localhost:3000/api/products/";
     fetch(apiURL)
         .then(function(response) {
             if (response.ok) {

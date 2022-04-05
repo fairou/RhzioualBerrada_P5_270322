@@ -1,12 +1,13 @@
-const apiURL = "http://localhost:3000/api/products/";
 let totalQuantity = 0;
 let totalPrice = 0;
 
 getProductsFromCart();
+addEventOrder();
 
 
 /** Get List of products from storage */
 function getProductsFromCart() {
+
     const storage = getStorageByName('ProductStorage');
 
     for (let prd of storage) {
@@ -18,12 +19,16 @@ function getProductsFromCart() {
 
 /** Get one product detail from API */
 function getProduct(prdStorage) {
+    const apiURL = "http://localhost:3000/api/products/";
+
     fetch(apiURL + prdStorage.id)
         .then(function(response) {
             if (response.ok) {
-                response.json().then(function(prdApi) {
-                    showProduct(prdApi, prdStorage);
-                }).then(addEventListener);
+                response.json()
+                    .then(function(prdApi) {
+                        showProduct(prdApi, prdStorage);
+                    })
+                    .then(addEventListener);
             }
         })
         .catch(function(err) {
@@ -32,6 +37,7 @@ function getProduct(prdStorage) {
 }
 /** show products detail to pageweb */
 function showProduct(prdApi, prdStorage) {
+
     const element = document.createElement('article');
     element.className = "cart__item";
     element.setAttribute('data-id', prdStorage.id);
@@ -62,17 +68,19 @@ function showProduct(prdApi, prdStorage) {
 
 /** Calculat Total: quantity & Price */
 function showTotalCart() {
+    const apiURL = "http://localhost:3000/api/products/";
+
     const storage = getStorageByName('ProductStorage');
     let qnt = 0;
     let price = 0;
 
-    for (let prd of storage) {
-        fetch(apiURL + prd.id)
+    for (let prdStorage of storage) {
+        fetch(apiURL + prdStorage.id)
             .then(function(response) {
                 if (response.ok) {
-                    response.json().then(function(product) {
-                        qnt += Number(prd.quantity);
-                        price += (Number(prd.quantity) * Number(product.price))
+                    response.json().then(function(prdApi) {
+                        qnt += Number(prdStorage.quantity);
+                        price += (Number(prdStorage.quantity) * Number(prdApi.price))
                         document.getElementById('totalQuantity').innerHTML = qnt;
                         document.getElementById('totalPrice').innerHTML = price;
                     });
@@ -100,11 +108,11 @@ function addEventListener() {
         itemQuantity[i].addEventListener('change', updateQuantity, false);
     }
 
-    document.getElementById("order").addEventListener("click", orderCommand);
 
 }
 /** Remove product */
 var removeProduct = function() {
+
     const storage = getStorageByName('ProductStorage');
 
     var article = this.closest("article");
@@ -126,11 +134,10 @@ var removeProduct = function() {
 };
 /** Update product quntity */
 var updateQuantity = function() {
-    console.log(this);
+
     const storage = getStorageByName('ProductStorage');
 
     var article = this.closest("article");
-    console.log(article.dataset.color);
     var id = article.dataset.id;
     var color = article.dataset.color;
 
@@ -145,9 +152,32 @@ var updateQuantity = function() {
     showTotalCart();
 }
 
-function orderCommand() {
+function validationForm() {
+    var isItValid = true;
+    var firstName = document.getElementById("firstName");
+    var lastName = document.getElementById("lastName");
+    var email = document.getElementById("email");
+    var address = document.getElementById("address");
 
-    alert('order now');
+    if (firstName.validity.valueMissing) {
+        isItValid = false;
+    }
+    if (email.validity.valueMissing) {
+        isItValid = false;
+    }
+    return isItValid;
+}
+
+
+function addEventOrder() {
+    document.getElementById("order").addEventListener("click", orderCommand);
+}
+
+function orderCommand() {
+    if (validationForm()) {
+        alert('order now');
+    }
+
 }
 /** Get storage by Name */
 function getStorageByName(name) {
