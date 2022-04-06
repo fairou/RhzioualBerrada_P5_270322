@@ -73,27 +73,29 @@ function showTotalCart() {
     const storage = getStorageByName('ProductStorage');
     let qnt = 0;
     let price = 0;
+    if (getStorageByName('ProductStorage').length == 0) {
+        document.getElementById('totalQuantity').innerHTML = qnt;
+        document.getElementById('totalPrice').innerHTML = price;
+        document.getElementById("order").setAttribute("disabled", "disabled");
 
-    for (let prdStorage of storage) {
-        fetch(apiURL + prdStorage.id)
-            .then(function(response) {
-                if (response.ok) {
-                    response.json().then(function(prdApi) {
-                        qnt += Number(prdStorage.quantity);
-                        price += (Number(prdStorage.quantity) * Number(prdApi.price))
-                        document.getElementById('totalQuantity').innerHTML = qnt;
-                        document.getElementById('totalPrice').innerHTML = price;
-                    });
-                }
-            })
-            .catch(function(err) {
-                console.error('Une erreur est survenue', err);
-            });
-
-
-
+    } else {
+        for (let prdStorage of storage) {
+            fetch(apiURL + prdStorage.id)
+                .then(function(response) {
+                    if (response.ok) {
+                        response.json().then(function(prdApi) {
+                            qnt += Number(prdStorage.quantity);
+                            price += (Number(prdStorage.quantity) * Number(prdApi.price))
+                            document.getElementById('totalQuantity').innerHTML = qnt;
+                            document.getElementById('totalPrice').innerHTML = price;
+                        });
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Une erreur est survenue', err);
+                });
+        }
     }
-
 }
 
 /** Add eventListner to Remove product and Quantity */
@@ -114,7 +116,7 @@ function addEventListener() {
 var removeProduct = function() {
 
     const storage = getStorageByName('ProductStorage');
-
+    console.log(this);
     var article = this.closest("article");
     var id = article.dataset.id;
     var color = article.dataset.color;
@@ -132,14 +134,44 @@ var removeProduct = function() {
     article.remove();
     showTotalCart();
 };
+
+function removeQuantityNull(article) {
+    const storage = getStorageByName('ProductStorage');
+    console.log(this);
+
+    var id = article.dataset.id;
+    var color = article.dataset.color;
+
+    // Remove product from storage
+    for (var i = 0; i < storage.length; i++) {
+
+        if (storage[i].id == id && storage[i].color == color) {
+            storage.splice(i, 1);
+        }
+    }
+    localStorage.setItem('ProductStorage', JSON.stringify(storage));
+
+    // Remove product from webpage
+    article.remove();
+    showTotalCart();
+}
+
+
 /** Update product quntity */
 var updateQuantity = function() {
-
+    console.log(this);
     const storage = getStorageByName('ProductStorage');
 
     var article = this.closest("article");
     var id = article.dataset.id;
     var color = article.dataset.color;
+    //verifier si la quantité = 0
+
+    if (this.value == 0) {
+        removeQuantityNull(article);
+        return
+    }
+
 
     // update product from storage
     for (var i = 0; i < storage.length; i++) {
@@ -158,12 +190,59 @@ function validationForm() {
     var lastName = document.getElementById("lastName");
     var email = document.getElementById("email");
     var address = document.getElementById("address");
+    var city = document.getElementById("city");
 
     if (firstName.validity.valueMissing) {
         isItValid = false;
+    } else {
+        if (/[A-Za-z\. -]+/.test(firstName.value) == false) {
+            isItValid = false;
+            document.getElementById("firstNameErrorMsg").innerText = "Votre nom n'est pas valide";
+        } else {
+            document.getElementById("firstNameErrorMsg").innerText = "";
+        }
+
+    }
+
+    if (lastName.validity.valueMissing) {
+        isItValid = false;
+    } else {
+        if (/[A-Za-z\. -]+/.test(lastName.value) == false) {
+            isItValid = false;
+            document.getElementById("lastNameErrorMsg").innerText = "Votre prenom n'est pas valide";
+        } else {
+            document.getElementById("lastNameErrorMsg").innerText = "";
+        }
     }
     if (email.validity.valueMissing) {
         isItValid = false;
+    } else {
+        if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value) == false) {
+            isItValid = false;
+            document.getElementById("emailErrorMsg").innerText = "Votre email n'est pas valide";
+        } else {
+            document.getElementById("emailErrorMsg").innerText = "";
+        }
+    }
+    if (address.validity.valueMissing) {
+        isItValid = false;
+    } else {
+        if (/^\s*\S+(?:\s+\S+){2}/.test(address.value) == false) {
+            isItValid = false;
+            document.getElementById("addressErrorMsg").innerText = "Votre adresse n'est pas valide";
+        } else {
+            document.getElementById("addressErrorMsg").innerText = "";
+        }
+    }
+    if (city.validity.valueMissing) {
+        isItValid = false;
+    } else {
+        if (/[a-zA-Z -]+/.test(city.value) == false) {
+            isItValid = false;
+            document.getElementById("cityErrorMsg").innerText = "Votre ville n'est pas valide";
+        } else {
+            document.getElementById("cityErrorMsg").innerText = "";
+        }
     }
     return isItValid;
 }
@@ -173,9 +252,13 @@ function addEventOrder() {
     document.getElementById("order").addEventListener("click", orderCommand);
 }
 
-function orderCommand() {
+function orderCommand(e) {
+
     if (validationForm()) {
+
         alert('order now');
+    } else {
+        e.preventDefault();
     }
 
 }
