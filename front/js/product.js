@@ -1,8 +1,5 @@
 getProduct();
 
-/** call event Click */
-addEvent();
-
 /** 
  * Get param id from URL
  * @return { string }   string
@@ -67,18 +64,18 @@ function showProduct(product) {
         const option = document.createElement("option");
         option.value = color;
         option.textContent = color;
-
         document.getElementById("colors").append(option);
     }
 }
-
+/** call event Click */
+addEvent();
 /**
  * Function to attach event
  */
 function addEvent() {
     document
         .getElementById("addToCart")
-        .addEventListener("click", formValidation);
+        .addEventListener("click", checkInputs);
     document
         .getElementById("quantity")
         .addEventListener("change", function(e) {
@@ -88,18 +85,23 @@ function addEvent() {
         });
 }
 
-/** check if fields are ok and and add product to cart*/
-function formValidation() {
+/** check if fields are ok and add product to cart*/
+function checkInputs() {
     const id = getUrlParam();
     const color = document.getElementById("colors").value;
     const quantity = document.getElementById("quantity").value;
 
-    if (color != "" && (Number(quantity) > 0 && Number(quantity) <= 100)) {
-        addToCart(id, color, quantity);
-
-    } else {
-        alert("veuillez choisir une couleur et une quantitée entre 1 et 100");
+    if (color == "") {
+        alert("veuillez choisir une couleur");
+        return;
     }
+    if (Number(quantity) < 1 || Number(quantity) > 100) {
+        alert("veuillez choisir une quantitée entre 1 et 100");
+        return;
+    }
+
+    addToCart(id, color, quantity);
+
 }
 
 /**
@@ -127,29 +129,23 @@ function addToCart(id, color, quantity) {
         createStorage();
         addProcuct(id, color, quantity);
     }
-
-
-
 }
 /**
  * return if the same prdt id with the same color exist
  * @param {string} id       product id
  * @param {string} color    product color
  * @returns boolean
- */
+ */ // i need to search on storage and check if existing product with the same id and color exist
+// then : return true;
+// else: return false
 function existProduct(id, color) {
-    // i need to search on storage and check if existing product with the same id and color exist
-    // then : return true;
-    // else: return false
     const storage = JSON.parse(localStorage.getItem('ProductStorage'));
-
     for (let prd of storage) {
         if (prd.id == id && prd.color == color) {
             return true;
         }
     }
     return false;
-
 }
 
 /**

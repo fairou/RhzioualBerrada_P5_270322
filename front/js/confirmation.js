@@ -21,9 +21,8 @@ function getUrlParam() {
 function confirmOrder() {
     const id = getUrlParam();
     if (id) {
-        document.getElementById("orderId").innerHTML = getUrlParam();
+        document.getElementById("orderId").textContent = getUrlParam();
     } else {
-
         document.getElementsByClassName("confirmation")[0].innerHTML = "<p>Aucune commande n'a été effectué</p>";
         console.error("url param not found");
     }

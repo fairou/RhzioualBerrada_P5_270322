@@ -54,7 +54,7 @@ function addProducts(products) {
     }
 }
 
-function showError(msg) {
+function showError(err) {
     console.error('Une erreur est survenue', msg);
     document.getElementById("items").textContent = "Une erreur est survenue. Veuillez nous excusez";
     document.getElementById("items").style.color = "#3d424f";

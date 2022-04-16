@@ -1,10 +1,7 @@
 getProductsFromCart();
-addEventOrder();
-
 
 /** Get List of products from storage and calculate total price & quantity of cart*/
 function getProductsFromCart() {
-
     const storage = getStorageByName('ProductStorage');
     if (storage) {
         for (let prd of storage) {
@@ -17,7 +14,6 @@ function getProductsFromCart() {
         document.getElementById("cart__items").textContent = "Votre panier est vide!";
         document.getElementById("order").setAttribute("disabled", "disabled");
     }
-
 }
 /**
  * Get one product detail form API
@@ -87,7 +83,7 @@ function showProduct(prdApi, prdStorage) {
     let pColor = document.createElement("p");
     pColor.textContent = prdStorage.color;
     let pPrice = document.createElement("p");
-    pPrice.textContent = prdApi.price;
+    pPrice.textContent = prdApi.price + " €";
 
     div_item__description.append(hName, pColor, pPrice);
 
@@ -125,6 +121,7 @@ function showProduct(prdApi, prdStorage) {
 
     document.getElementById('cart__items').appendChild(element);
 }
+
 /** Calculat Total: quantity & Price */
 function calculateTotalCart() {
     const apiURL = "http://localhost:3000/api/products/";
@@ -172,12 +169,10 @@ function addEventListener() {
 }
 /** Remove product from cart*/
 var removeProduct = function() {
-
     const storage = getStorageByName('ProductStorage');
     var article = this.closest("article");
     var id = article.dataset.id;
     var color = article.dataset.color;
-
     // Remove product from storage
     for (var i = 0; i < storage.length; i++) {
 
@@ -216,19 +211,15 @@ function removeQuantityNull(article) {
 }
 /** Update product quntity on cart*/
 var updateQuantity = function() {
-
     var storage = getStorageByName('ProductStorage');
-
     var article = this.closest("article");
     var id = article.dataset.id;
     var color = article.dataset.color;
     //verifier si la quantité = 0
-
     if (this.value == 0) {
         removeQuantityNull(article);
         return;
     }
-
     // update product from storage
     for (var element of storage) {
 
@@ -254,19 +245,27 @@ function validationForm() {
     if (firstName.validity.valueMissing) {
         isItValid = false;
     } else {
-        if (/[A-Za-z\. -]+/.test(firstName.value) == false) {
+        if (/^[A-Za-z -]+$/.test(firstName.value) == false) {
             isItValid = false;
-            document.getElementById("firstNameErrorMsg").innerText = "Votre nom n'est pas valide";
+            document.getElementById("firstNameErrorMsg").textContent = "Votre nom n'est pas valide";
         } else {
-            document.getElementById("firstNameErrorMsg").innerText = "";
+            document.getElementById("firstNameErrorMsg").textContent = "";
         }
 
     }
+    // const checkNumber = /[0-9]/;
+    // Utilisation
+    // if(checkNumber.test(MaValeur) === true) ; 
+    //une regex pour exclure les caractères spéciaux
+    //const checkSpecialCharacter = /[§!@#$%^&*(),.?":{}|<>]/;
+    //et une pour l'email (il  a plein d'autres)
+    // const checkMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
+    //[A-Za-z\. -]+/
     if (lastName.validity.valueMissing) {
         isItValid = false;
     } else {
-        if (/[A-Za-z\. -]+/.test(lastName.value) == false) {
+        if (/^[A-Za-z -]+$/.test(lastName.value) == false) {
             isItValid = false;
             document.getElementById("lastNameErrorMsg").innerText = "Votre prenom n'est pas valide";
         } else {
@@ -286,7 +285,7 @@ function validationForm() {
     if (address.validity.valueMissing) {
         isItValid = false;
     } else {
-        if (/^\s*\S+(?:\s+\S+){2}/.test(address.value) == false) {
+        if (/[^A-Za-z0-9]+/.test(address.value) == false) {
             isItValid = false;
             document.getElementById("addressErrorMsg").innerText = "Votre adresse n'est pas valide";
         } else {
@@ -296,7 +295,7 @@ function validationForm() {
     if (city.validity.valueMissing) {
         isItValid = false;
     } else {
-        if (/[a-zA-Z -]+/.test(city.value) == false) {
+        if (/^[A-Za-z -]+$/.test(city.value) == false) {
             isItValid = false;
             document.getElementById("cityErrorMsg").innerText = "Votre ville n'est pas valide";
         } else {
@@ -306,6 +305,7 @@ function validationForm() {
 
     return isItValid;
 }
+addEventOrder();
 /**
  * Function to attach event
  */
