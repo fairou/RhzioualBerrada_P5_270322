@@ -130,8 +130,8 @@ function calculateTotalCart() {
     let qnt = 0;
     let price = 0;
     if (storage.length == 0) {
-        document.getElementById('totalQuantity').innerHTML = qnt;
-        document.getElementById('totalPrice').innerHTML = price;
+        document.getElementById('totalQuantity').textContent = qnt;
+        document.getElementById('totalPrice').textContent = price;
         document.getElementById("order").setAttribute("disabled", "disabled");
 
     } else {
@@ -142,8 +142,8 @@ function calculateTotalCart() {
                         response.json().then(function(prdApi) {
                             qnt += Number(prdStorage.quantity);
                             price += (Number(prdStorage.quantity) * Number(prdApi.price))
-                            document.getElementById('totalQuantity').innerHTML = qnt;
-                            document.getElementById('totalPrice').innerHTML = price;
+                            document.getElementById('totalQuantity').textContent = qnt;
+                            document.getElementById('totalPrice').textContent = price;
                         });
                     }
                 })
@@ -163,9 +163,12 @@ function addEventListener() {
     var itemQuantity = document.getElementsByClassName("itemQuantity");
     for (var i = 0; i < itemQuantity.length; i++) {
         itemQuantity[i].addEventListener('change', updateQuantity, false);
+        itemQuantity[i].addEventListener('blur', function() {
+            if (this.value < 1 || this.value > 100) {
+                this.focus();
+            }
+        }, false);
     }
-
-
 }
 /** Remove product from cart*/
 var removeProduct = function() {
@@ -211,6 +214,7 @@ function removeQuantityNull(article) {
 }
 /** Update product quntity on cart*/
 var updateQuantity = function() {
+    console.log(this.value);
     var storage = getStorageByName('ProductStorage');
     var article = this.closest("article");
     var id = article.dataset.id;
@@ -218,17 +222,19 @@ var updateQuantity = function() {
     //verifier si la quantité = 0
     if (this.value == 0) {
         removeQuantityNull(article);
-        return;
-    }
-    // update product from storage
-    for (var element of storage) {
+    } else if (this.value < 1 || this.value > 100) {
+        alert("veuillez choisir une quantitée entre 1 et 100");
+    } else {
+        // update product from storage
+        for (var element of storage) {
 
-        if (element.id == id && element.color == color) {
-            element.quantity = this.value;
+            if (element.id == id && element.color == color) {
+                element.quantity = this.value;
+            }
         }
+        localStorage.setItem('ProductStorage', JSON.stringify(storage));
+        calculateTotalCart();
     }
-    localStorage.setItem('ProductStorage', JSON.stringify(storage));
-    calculateTotalCart();
 };
 /**
  * return true|false if inputs form are valid
@@ -253,23 +259,14 @@ function validationForm() {
         }
 
     }
-    // const checkNumber = /[0-9]/;
-    // Utilisation
-    // if(checkNumber.test(MaValeur) === true) ; 
-    //une regex pour exclure les caractères spéciaux
-    //const checkSpecialCharacter = /[§!@#$%^&*(),.?":{}|<>]/;
-    //et une pour l'email (il  a plein d'autres)
-    // const checkMail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-    //[A-Za-z\. -]+/
     if (lastName.validity.valueMissing) {
         isItValid = false;
     } else {
         if (/^[A-Za-z -]+$/.test(lastName.value) == false) {
             isItValid = false;
-            document.getElementById("lastNameErrorMsg").innerText = "Votre prenom n'est pas valide";
+            document.getElementById("lastNameErrorMsg").textContent = "Votre prenom n'est pas valide";
         } else {
-            document.getElementById("lastNameErrorMsg").innerText = "";
+            document.getElementById("lastNameErrorMsg").textContent = "";
         }
     }
     if (email.validity.valueMissing) {
@@ -277,9 +274,9 @@ function validationForm() {
     } else {
         if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email.value) == false) {
             isItValid = false;
-            document.getElementById("emailErrorMsg").innerText = "Votre email n'est pas valide";
+            document.getElementById("emailErrorMsg").textContent = "Votre email n'est pas valide";
         } else {
-            document.getElementById("emailErrorMsg").innerText = "";
+            document.getElementById("emailErrorMsg").textContent = "";
         }
     }
     if (address.validity.valueMissing) {
@@ -287,9 +284,9 @@ function validationForm() {
     } else {
         if (/[^A-Za-z0-9]+/.test(address.value) == false) {
             isItValid = false;
-            document.getElementById("addressErrorMsg").innerText = "Votre adresse n'est pas valide";
+            document.getElementById("addressErrorMsg").textContent = "Votre adresse n'est pas valide";
         } else {
-            document.getElementById("addressErrorMsg").innerText = "";
+            document.getElementById("addressErrorMsg").textContent = "";
         }
     }
     if (city.validity.valueMissing) {
@@ -297,12 +294,11 @@ function validationForm() {
     } else {
         if (/^[A-Za-z -]+$/.test(city.value) == false) {
             isItValid = false;
-            document.getElementById("cityErrorMsg").innerText = "Votre ville n'est pas valide";
+            document.getElementById("cityErrorMsg").textContent = "Votre ville n'est pas valide";
         } else {
-            document.getElementById("cityErrorMsg").innerText = "";
+            document.getElementById("cityErrorMsg").textContent = "";
         }
     }
-
     return isItValid;
 }
 addEventOrder();

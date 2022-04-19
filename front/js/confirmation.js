@@ -23,7 +23,8 @@ function confirmOrder() {
     if (id) {
         document.getElementById("orderId").textContent = getUrlParam();
     } else {
-        document.getElementsByClassName("confirmation")[0].innerHTML = "<p>Aucune commande n'a été effectué</p>";
+        var p = document.createElement('p').textContent = "Aucune commande n'a été effectué";
+        document.getElementsByClassName("confirmation")[0].append(p);
         console.error("url param not found");
     }
 }

@@ -213,7 +213,17 @@ function getStorageByName(name) {
 function showError(msg) {
     const item = document.getElementsByClassName("item")[0];
     console.error('Une erreur est survenue', msg);
-    item.innerHTML = "Nous n'avons pas pu trouver le produit demandé. Cliquez &nbsp;<a href='index.html'>ici</a>&nbsp; pour revenir à la liste des produits";
+    item.textContent = "";
+    var link = document.createElement("a")
+    link.setAttribute("href", "index.html");
+    link.textContent = " ici ";
+    var span1 = document.createElement("span");
+    span1.textContent = "Nous n'avons pas pu trouver le produit demandé. Cliquez \u00A0 ";
+    var span2 = document.createElement("span");
+    span2.textContent = "\u00A0 pour revenir à la liste des produits";
+
+    item.append(span1, link, span2);
+
     item.style.color = "#3d424f";
     item.style.backgroundColor = "white";
     item.style.textAlign = "#center";
